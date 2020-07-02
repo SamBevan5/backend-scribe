@@ -4,23 +4,25 @@ const Note = require('../models/notes.js');
 const jwt = require('jsonwebtoken');
 
 //AUTH MIDDLEWARE
-const auth = async (req, res, next) => {
-    //example header => "Authorization":"bearer kdf909sdfsd98f987d"
-    const { authorization } = req.headers; //decon auth header
-    //check if header is present
-    if (authorization) {
-        try {
-            const token = authorization.split(' ')[1]; //parses token from header
-            const payload = jwt.verify(token, 'secret');
-            req.user = payload; //puts user data into request object
-            next(); //go to the route
-        } catch (error) {
-            res.status(400).json(error);
+const auth = (req, res, next) => {
+    try {
+        let token = req.headers.authorization
+        if (!token) {
+            return res.status(401).json({msg: "No token"})
         }
-    } else {
-        res.status(400).send('NO AUTHORIZATION HEADER');
+        token = token.split(' ')[1]
+        const verified = jwt.verify(token, process.env.jwtSECRET)
+        if (!verified) {
+            return res.status(401).json({msg: "Not verified"})
+        }
+        // console.log(verified)
+        req.user = verified
+        next();
+    }   
+    catch (error) {
+        res.status(500).json({error: error.message})
     }
-};
+}
 //////////////////////////
 
 router.post('/', async (req, res) => {
