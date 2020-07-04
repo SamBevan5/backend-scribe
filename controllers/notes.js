@@ -25,35 +25,36 @@ const auth = (req, res, next) => {
 }
 //////////////////////////
 
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
     try {
         console.log(req.body);
-        const createdNote = await Note.create(req.body);
+        const newNote = {...req.body, username: req.user.username}
+        const createdNote = await Note.create(newNote);
         res.status(200).json(createdNote);
     } catch (error) {
         res.status(400).json(error);
     }
 });
 
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
     try {
-        const notes = await Note.find({});
+        const notes = await Note.find({username: req.user.username})
         res.status(200).json(notes);
     } catch (error) {
         res.status(400).json(error);
     }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
     try {
-        const deletedHNote = await Note.findByIdAndDelete(req.params.id);
+        const deletedNote = await Note.findByIdAndDelete(req.params.id);
         res.status(200).json(deletedNote);
     } catch (error) {
         res.status(400).json(error);
     }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
     try {
         const updatedNote = await Note.findByIdAndUpdate(
             req.params.id,

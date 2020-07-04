@@ -1,9 +1,9 @@
-  const { Schema, model } = require('mongoose');
+const { Schema, model } = require('mongoose');
 
 const noteSchema = new Schema({
-    name: { type: String, required: true },
-    description: { type: String},
-    number: { type: Number, default: 0 },
+    title: { type: String, required: true },
+    notes: { type: String},
+    username: { type: String}
 });
 
 const Note = model('note', noteSchema);
